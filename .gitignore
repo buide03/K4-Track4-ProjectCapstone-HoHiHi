@@ -1,0 +1,9 @@
+.venv/
+.venv-win/
+__pycache__/
+*.pyc
+outputs/
+*.pt
+.pytest_cache/
+*.download
+.ttc-*/
