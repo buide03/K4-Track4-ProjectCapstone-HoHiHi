@@ -146,3 +146,13 @@ qua YOLO–ByteTrack và đọc lại đủ frame video đầu ra.
 và xe làn bên. Chỉ công bố sai số TTC khi có dữ liệu tham chiếu đồng bộ từ cảm biến
 hoặc mô phỏng có ground truth. Rẽ, đường dốc, camera rung/zoom, che khuất và thay đổi
 hướng xe có thể làm sai TTC. Bản hiện tại chưa có radar/depth fusion hay điều khiển phanh.
+
+## Giao diện web tương tác
+
+Mã giao diện nằm trong [`ui/`](ui/README.md). Chạy từ thư mục gốc repo:
+
+```bash
+python3 -m http.server 8090 --directory ui
+```
+
+Mở `http://localhost:8090`. Giao diện hỗ trợ demo TTC, mở video cục bộ, chỉnh vùng đường, cấu hình ngưỡng và xuất dữ liệu demo. Bản UI chưa kết nối pipeline YOLO/Python; video tải lên chưa được nhận diện hoặc tính TTC.
