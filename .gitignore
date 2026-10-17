@@ -7,3 +7,6 @@ outputs/
 .pytest_cache/
 *.download
 .ttc-*/
+data/videos/
+data/uploads/
+data/thumbnails/

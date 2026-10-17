@@ -71,6 +71,19 @@ class WarningTests(unittest.TestCase):
         self.assertEqual(track.status, "WARMUP")
         self.assertIsNone(track.ttc)
 
+    def test_lane_loss_suppresses_alarm_and_requires_new_history(self):
+        engine = self.engine()
+        for i in range(21):
+            track = engine.update({8: box(80 * 4 / (4 - i / 10))}, i / 10)[8]
+        self.assertEqual(track.status, "WARNING")
+        track = engine.update({8: box(165)}, 2.1, lane_available=False)[8]
+        self.assertEqual(track.status, "LANE_UNAVAILABLE")
+        self.assertIsNone(track.ttc)
+        self.assertEqual(track.history, [])
+        track = engine.update({8: box(170)}, 2.2)[8]
+        self.assertEqual(track.status, "WARMUP")
+        self.assertIsNone(track.ttc)
+
     def test_clipped_and_abrupt_scale_reset(self):
         for invalid in ((0, 200, 1280, 600), box(400)):
             engine = self.engine()

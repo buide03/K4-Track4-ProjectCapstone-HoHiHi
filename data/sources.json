@@ -1,0 +1,49 @@
+{
+  "sources": [
+    {
+      "id": "udacity-traffic",
+      "title": "Dashcam · Xe phía trước & làn bên",
+      "description": "Đoạn thực tế 28–40 giây từ video Udacity, có nhiều xe gần camera. Không có TTC ground truth.",
+      "kind": "dashcam",
+      "path": "data/videos/udacity-traffic.webm",
+      "source_url": "https://github.com/udacity/CarND-Vehicle-Detection",
+      "attribution": "Udacity · Đoạn 28–40s · 15 FPS",
+      "license": "MIT (upstream repository)",
+      "zone": [[0.45, 0.55], [0.57, 0.55], [0.85, 0.98], [0.16, 0.98]]
+    },
+    {
+      "id": "udacity-highway",
+      "title": "Cao tốc · Xe cùng chiều",
+      "description": "Dashcam thực tế: xe phía trước, xe làn bên và thay đổi khoảng cách.",
+      "kind": "dashcam",
+      "path": "data/videos/udacity-highway.mp4",
+      "url": "https://raw.githubusercontent.com/udacity/CarND-Vehicle-Detection/master/project_video.mp4",
+      "source_url": "https://github.com/udacity/CarND-Vehicle-Detection",
+      "attribution": "Udacity · CarND Vehicle Detection",
+      "license": "MIT (upstream repository)",
+      "zone": [[0.45, 0.55], [0.57, 0.55], [0.85, 0.98], [0.16, 0.98]]
+    },
+    {
+      "id": "udacity-test",
+      "title": "Cao tốc · Đoạn thử ngắn",
+      "description": "Clip dashcam 1,52 giây để thử nhanh detection và giao diện.",
+      "kind": "dashcam",
+      "path": "data/videos/udacity-test.mp4",
+      "url": "https://raw.githubusercontent.com/udacity/CarND-Vehicle-Detection/master/test_video.mp4",
+      "source_url": "https://github.com/udacity/CarND-Vehicle-Detection",
+      "attribution": "Udacity · CarND Vehicle Detection",
+      "license": "MIT (upstream repository)",
+      "zone": [[0.45, 0.55], [0.57, 0.55], [0.85, 0.98], [0.16, 0.98]]
+    },
+    {
+      "id": "synthetic-approaching",
+      "title": "Giả lập · Xe tiến gần",
+      "description": "Kiểm tra WARNING và CRITICAL với TTC lý tưởng đã biết.",
+      "kind": "synthetic",
+      "path": "outputs/ttc-sample/approaching.mp4",
+      "source_url": "https://github.com/ultralytics/ultralytics/blob/main/ultralytics/assets/bus.jpg",
+      "attribution": "Giả lập độ lớn ảnh · Ultralytics bus sample",
+      "zone": [[0.271, 0.222], [0.729, 0.222], [0.937, 0.972], [0.0625, 0.972]]
+    }
+  ]
+}

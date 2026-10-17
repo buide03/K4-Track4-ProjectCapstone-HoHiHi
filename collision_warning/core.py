@@ -89,10 +89,12 @@ class Track:
 
 class WarningEngine:
     def __init__(self, polygon, frame_size, history_seconds=1.0, warning_ttc=3.0,
-                 critical_ttc=1.5, confirm_frames=3, min_expansion=.02):
+                 critical_ttc=1.5, confirm_frames=3, min_expansion=.02, lost_grace=0.0):
         if not all(isfinite(v) and v > 0 for v in
                    (history_seconds, warning_ttc, critical_ttc, min_expansion)):
             raise ValueError("History, TTC thresholds and minimum expansion must be finite and positive.")
+        if not isfinite(lost_grace) or lost_grace < 0:
+            raise ValueError("Lost-track grace must be finite and non-negative.")
         if critical_ttc >= warning_ttc or confirm_frames < 1:
             raise ValueError("Require 0 < critical TTC < warning TTC and confirm_frames >= 1.")
         self.polygon = polygon
@@ -102,7 +104,9 @@ class WarningEngine:
         self.critical_ttc = critical_ttc
         self.confirm_frames = confirm_frames
         self.min_expansion = min_expansion
+        self.lost_grace = lost_grace
         self.tracks = {}
+        self.last_seen = {}
         self.last_timestamp = None
 
     @staticmethod
@@ -113,13 +117,18 @@ class WarningEngine:
         track.reason = reason
         track.ttc = None
 
-    def update(self, observations: dict[int, tuple], timestamp: float):
+    def update(self, observations: dict[int, tuple], timestamp: float, lane_available=True, in_path=None):
+        """Returns the observed tracks. ``in_path`` ({id: bool}) overrides the polygon test, e.g. with
+        lane relations that extend the lane beyond the visible polygon or include cutting-in vehicles."""
         if not isfinite(timestamp) or (self.last_timestamp is not None and timestamp <= self.last_timestamp):
             raise ValueError("Video timestamps must be finite and strictly increasing.")
         self.last_timestamp = timestamp
-        # Lost tracks immediately lose TTC/alarm history, including when an ID is reused.
-        self.tracks = {key: value for key, value in self.tracks.items() if key in observations}
+        # Lost tracks lose TTC/alarm history once the grace period expires (immediately by default),
+        # including when an ID is reused.
+        self.tracks = {key: value for key, value in self.tracks.items()
+                       if key in observations or timestamp - self.last_seen[key] <= self.lost_grace}
         for key, box in observations.items():
+            self.last_seen[key] = timestamp
             if len(box) != 4 or not all(isfinite(v) for v in box):
                 raise ValueError("Bounding boxes must have four finite coordinates.")
             x1, y1, x2, y2 = box
@@ -129,7 +138,12 @@ class WarningEngine:
             track = self.tracks.setdefault(key, Track())
             track.ttc = track.fit_error = track.expansion_per_s = None
             track.width_px = width
-            track.in_path = inside(((x1 + x2) / 2, y2), self.polygon)
+            track.in_path = (in_path[key] if in_path is not None and key in in_path
+                             else inside(((x1 + x2) / 2, y2), self.polygon))
+            if not lane_available:
+                track.history.clear()
+                self.reset(track, "LANE_UNAVAILABLE", "automatic lane unavailable; TTC suppressed")
+                continue
             frame_width, frame_height = self.frame_size
             if x1 <= 1 or y1 <= 1 or x2 >= frame_width - 1 or y2 >= frame_height - 1:
                 track.history.clear()
@@ -186,4 +200,5 @@ class WarningEngine:
             else:
                 track.status = "PENDING"
             track.reason = "optical TTC estimate; constant closing speed assumption"
-        return self.tracks
+        self.last_seen = {key: self.last_seen[key] for key in self.tracks}
+        return {key: self.tracks[key] for key in observations}

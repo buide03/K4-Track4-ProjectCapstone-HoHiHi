@@ -43,7 +43,7 @@ def validate_result(output, scenario, expected_frames):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--device", default="cpu")
+    parser.add_argument("--device", default="auto")
     parser.add_argument("--model", default="yolo11n.pt")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
